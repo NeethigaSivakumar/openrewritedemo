@@ -1,0 +1,90 @@
+type: specs.openrewrite.org/v1beta/recipe
+name: com.legacybank.migration.Java17AndJakartaApiPrep
+displayName: Prepare banking service for Java 17 and Spring Boot 3
+description: Complete migration recipe that upgrades Spring Boot 2 to 3, updates Java to 17, and converts all legacy javax.* APIs to jakarta.*.
+recipeList:
+  # 1. Master Spring Boot 2.x to 3.x Migration Recipe
+  - org.openrewrite.java.spring.boot3.UpgradeSpringBoot_3_0
+
+  # 2. Java 17 Maven Compiler & Property Setup
+  - org.openrewrite.maven.UpdateMavenProjectPropertyJavaVersion:
+      version: 17
+  - org.openrewrite.maven.UseMavenCompilerPluginReleaseConfiguration:
+      releaseVersion: 17
+  - org.openrewrite.maven.UpgradePluginVersion:
+      groupId: org.apache.maven.plugins
+      artifactId: maven-compiler-plugin
+      newVersion: 3.14.x
+
+  # 3. Additional Explicit Package Name Migrations (javax -> jakarta)
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: javax.jws
+      newPackageName: jakarta.jws
+      recursive: true
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: javax.xml.ws
+      newPackageName: jakarta.xml.ws
+      recursive: true
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: javax.xml.bind
+      newPackageName: jakarta.xml.bind
+      recursive: true
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: javax.servlet
+      newPackageName: jakarta.servlet
+      recursive: true
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: javax.persistence
+      newPackageName: jakarta.persistence
+      recursive: true
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: javax.validation
+      newPackageName: jakarta.validation
+      recursive: true
+
+  # 4. Class Type Migrations
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: javax.annotation.Resource
+      newFullyQualifiedTypeName: jakarta.annotation.Resource
+
+  # 5. Dependency Updates in pom.xml
+  - org.openrewrite.java.dependencies.ChangeDependency:
+      oldGroupId: javax.xml.ws
+      oldArtifactId: jaxws-api
+      newGroupId: jakarta.xml.ws
+      newArtifactId: jakarta.xml.ws-api
+      newVersion: 4.0.x
+  - org.openrewrite.java.dependencies.ChangeDependency:
+      oldGroupId: javax.jws
+      oldArtifactId: javax.jws-api
+      newGroupId: jakarta.jws
+      newArtifactId: jakarta.jws-api
+      newVersion: 3.0.x
+  - org.openrewrite.java.dependencies.ChangeDependency:
+      oldGroupId: javax.annotation
+      oldArtifactId: javax.annotation-api
+      newGroupId: jakarta.annotation
+      newArtifactId: jakarta.annotation-api
+      newVersion: 2.1.x
+  - org.openrewrite.java.dependencies.ChangeDependency:
+      oldGroupId: javax.servlet
+      oldArtifactId: servlet-api
+      newGroupId: jakarta.servlet
+      newArtifactId: jakarta.servlet-api
+      newVersion: 6.0.x
+  - org.openrewrite.java.dependencies.ChangeDependency:
+      oldGroupId: javax.persistence
+      oldArtifactId: javax.persistence-api
+      newGroupId: jakarta.persistence
+      newArtifactId: jakarta.persistence-api
+      newVersion: 3.1.x
+  - org.openrewrite.java.dependencies.ChangeDependency:
+      oldGroupId: javax.validation
+      oldArtifactId: validation-api
+      newGroupId: jakarta.validation
+      newArtifactId: jakarta.validation-api
+      newVersion: 3.0.x
+  - org.openrewrite.java.dependencies.UpgradeDependencyVersion:
+      groupId: com.sun.xml.ws
+      artifactId: jaxws-rt
+      newVersion: 4.0.x
