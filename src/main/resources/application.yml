@@ -1,6 +1,18 @@
 server:
   port: 8080
+
 spring:
-  # This property is deprecated in SB2. OpenRewrite will move it to spring.data.redis.host
-    redis:
-      host: localhost
+  # SB2: spring.redis -> SB3: spring.data.redis
+  redis:
+    host: localhost
+    port: 6379
+
+  # SB2: spring.jpa.hibernate.use-new-id-generator-mappings is deprecated in SB3
+  jpa:
+    hibernate:
+      use-new-id-generator-mappings: true
+    show-sql: true
+
+# SB2: logging.file -> SB3: logging.file.name
+logging:
+  file: app.log
